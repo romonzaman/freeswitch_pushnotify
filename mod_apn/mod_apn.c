@@ -767,7 +767,7 @@ end:
 static void register_event_handler(switch_event_t *event)
 {
 	char *event_user = NULL, *event_realm = NULL;//, *event_contact = NULL;
-	char *contact_ptr = NULL, *voip_token = NULL, *im_token = NULL, *platform = NULL, *foo = NULL, *query = NULL, *app_id = NULL;
+	char *ua_ptr = NULL, *voip_token = NULL, *im_token = NULL, *platform = NULL, *foo = NULL, *query = NULL, *app_id = NULL;
 	char *update_reg = NULL, *user_agent = NULL;
 
 	update_reg = switch_event_get_header(event, "update-reg");
@@ -784,10 +784,11 @@ static void register_event_handler(switch_event_t *event)
 	if (zstr(user_agent)) {
 		return;
 	}
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "user_agent: '%s'\n", user_agent);
 
-	contact_ptr = app_id = voip_token = im_token = platform = strdup(user_agent);
+	ua_ptr = app_id = voip_token = im_token = platform = strdup(user_agent);
 
-	if (zstr(contact_ptr)) {
+	if (zstr(ua_ptr)) {
 		goto end;
 	}
 
@@ -831,10 +832,8 @@ static void register_event_handler(switch_event_t *event)
 	if (platform && (foo = strchr(platform, ';')) != NULL) {
 		*platform = '\0';
 	}
-	// if(zstr(app_id)){
-	// 	strcpy(app_id, "omnixrm");
-	// }
 	if (zstr(app_id) || (zstr(voip_token) && zstr(im_token)) || zstr(platform)) {
+		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "missing app_id/voip_token/im_token/platform in user_agent\n");
 		goto end;
 	}
 
@@ -889,7 +888,7 @@ static void register_event_handler(switch_event_t *event)
 	}
 
 	end:
-	switch_safe_free(contact_ptr);
+	switch_safe_free(ua_ptr);
 }
 
 static int init_sql(void)
