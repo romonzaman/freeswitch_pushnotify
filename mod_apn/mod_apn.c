@@ -830,7 +830,7 @@ static void register_event_handler(switch_event_t *event)
 		*foo = '\0';
 	}
 	if (platform && (foo = strchr(platform, ';')) != NULL) {
-		*platform = '\0';
+		*foo = '\0';
 	}
 	if (!zstr(app_id)){
 		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "app_id='%s'\n", app_id);
