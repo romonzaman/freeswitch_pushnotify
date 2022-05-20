@@ -832,6 +832,15 @@ static void register_event_handler(switch_event_t *event)
 	if (platform && (foo = strchr(platform, ';')) != NULL) {
 		*platform = '\0';
 	}
+	if (!zstr(app_id)){
+		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "app_id='%s'\n", app_id);
+	}
+	if (!zstr(voip_token)){
+		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "voip_token='%s'\n", voip_token);
+	}
+	if (!zstr(platform)){
+		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "platform='%s'\n", platform);
+	}
 	if (zstr(app_id) || (zstr(voip_token) && zstr(im_token)) || zstr(platform)) {
 		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "missing app_id/voip_token/im_token/platform in user_agent\n");
 		goto end;
