@@ -139,7 +139,7 @@ static int do_curl(switch_event_t *event, profile_t *profile)
 	}
 
 	if (!strncasecmp(query, "https", 5)) {
-		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_WARNING, "Not verifying TLS cert for %s; connection is not secure\n", query);
+		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "Not verifying TLS cert for %s; connection is not secure\n", query);
 		switch_curl_easy_setopt(curl_handle, CURLOPT_SSL_VERIFYPEER, 0);
 		switch_curl_easy_setopt(curl_handle, CURLOPT_SSL_VERIFYHOST, 0);
 	}
@@ -601,6 +601,7 @@ static void add_item_to_event(switch_event_t *event, char *name, cJSON *obj)
 static void push_event_handler(switch_event_t *event)
 {
 	char *payload = NULL, *user = NULL, *realm = NULL, *type = NULL, *uuid = NULL, *json_tokens = NULL;
+	char *cid_name = NULL, *cid_number = NULL;
 	profile_t *profile = NULL;
 	callback_t cbt = { cJSON_CreateArray() };
 	switch_bool_t res = SWITCH_FALSE;
@@ -1089,6 +1090,12 @@ static switch_call_cause_t apn_wait_outgoing_channel(switch_core_session_t *sess
 			switch_event_add_header_string(event, SWITCH_STACK_BOTTOM, "type", "voip");
 			switch_event_add_header_string(event, SWITCH_STACK_BOTTOM, "user", user);
 			switch_event_add_header_string(event, SWITCH_STACK_BOTTOM, "realm", domain);
+			if(!zstr(cid_name_override)) {
+				switch_event_add_header_string(event, SWITCH_STACK_BOTTOM, "cid_name", cid_name_override);
+			}
+			if(!zstr(cid_num_override)) {
+				switch_event_add_header_string(event, SWITCH_STACK_BOTTOM, "cid_number", cid_num_override);
+			}
 			switch_event_add_body(event, "{\"content-available\":true,\"custom\":[{\"name\":\"content-message\",\"value\":\"incomming call\"}]}");
 			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "CARUSTO. Fire event APN for User: %s@%s\n", user, domain);
 			switch_event_fire(&event);
