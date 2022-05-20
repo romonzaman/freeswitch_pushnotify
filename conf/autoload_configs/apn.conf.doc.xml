@@ -1,0 +1,88 @@
+<configuration name="apn.conf" description="Configuration APN Service">
+	<settings>
+		<!-- Connection string to db. mod_apn will create table push_tokens with schema:
+		"CREATE TABLE push_tokens ("
+			"id				serial NOT NULL,"
+			"token			VARCHAR(255) NOT NULL,"
+			"extension		VARCHAR(255) NOT NULL,"
+			"realm			VARCHAR(255) NOT NULL,"
+			"app_id			VARCHAR(255) NOT NULL,"
+			"type			VARCHAR(255) NOT NULL,"
+			"platform		VARCHAR(255) NOT NULL,"
+			"last_update	timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+			"CONSTRAINT push_tokens_pkey PRIMARY KEY (id)
+		)"
+		logic for expire tokens doesn't implemented yet.
+		 -->
+		<param name="odbc_dsn" value="pgsql://hostaddr=$${odbc_host} dbname=$${odbc_db} user=$${odbc_user} password=$${odbc_pass} options='-c client_min_messages=NOTICE'" />
+		<!-- Name of REGISTER contact parameter, which should contain VOIP token
+				value from contact parameter `contact_voip_token_param` will be stored to db with ${type}: `voip` and can be used as
+				${token} in url and/or post parameters
+		-->
+		<param name="contact_voip_token_param" value="pn-voip-tok"/>
+		<!-- Name of REGISTER contact parameter, which should contain IM token
+				value from contact parameter `contact_im_token_param` will be stored to db with ${type}: `im` and can be used as
+				${token} in url and/or post parameters
+		-->
+		<param name="contact_im_token_param" value="pn-im-tok"/>
+		<!-- Name of REGISTER contact parameter, which should contain application id
+				value from contact parameter `contact_app_id_param` will be stored to db and can be used as
+				${app_id} in url and/or post parameters
+		-->
+		<param name="contact_app_id_param" value="app-id"/>
+		<!-- Name of REGISTER contact parameter, which should contain platform
+				value from contact parameter `contact_app_id_param` will be stored to db and can be used as
+				${platform} in url and/or post parameters
+		-->
+		<param name="contact_platform_param" value="pn-platform"/>
+	</settings>
+
+	<profiles>
+		<profile name="voip">
+			<param name="id" value="0"/>
+			<!-- URI template parameter with variables: ${type}, ${user}, ${realm}, ${token}, ${app_id}, ${platform} -->
+			<param name="url" value="http://somedomain.com/${type}/${realm}/${user}/${token}/${app_id}/${platform}"/>
+			<!-- Supported methods: GET and POST -->
+			<param name="method" value="post"/>
+			<!-- Optional parameter. Supported auth types: None, JWT, DIGEST, BASIC -->
+			<param name="auth_type" value="digest"/>
+			<!-- Optional parameter. For JWT add token only, for digest or basic: login:password -->
+			<param name="auth_data" value="admin:password"/>
+			<!-- Optional parameter. Will be added header Content-Type with value from this parameter -->
+			<param name="content_type" value=""/>
+			<!-- Optional parameter. Libcurl connect_timeout parameter, sec -->
+			<param name="connect_timeout" value="300"/>
+			<!-- Optional parameter. CURL timeout parameter, sec -->
+			<param name="timeout" value="0"/>
+			<!-- Post body template use variables:
+					${type}, - voip or im
+					${app_id}, - application id from db (whatever you set to `contact_app_id_param`)
+					${user}, - user extension number
+					${realm}, - Realm
+					${token}, - token
+					${platform} - platform (whatever you set to `contact_platform_param`)
+					${payload} - json body of payload (cli command apn only)
+				Default value: {"type": "${type}",
+								"app":"${app_id}",
+								"token":"${token}",
+								"user":"${user}",
+								"realm":"${realm}",
+								"payload":${payload},
+								"platform":"${platform}"}
+			-->
+			<param name="post_data_template" value="type=${type}&app_id=${app_id}&user=${user}&realm=${realm}&token=${token}&platform=${platform}&payload=${payload}"/>
+		</profile>
+
+		<profile name="im">
+			<param name="id" value="2"/>
+			<param name="url" value="http://somedomain.com/${type}/${realm}/${user}"/>
+			<param name="method" value="post"/>
+			<param name="auth_type" value="digest"/>
+			<param name="auth_data" value="admin:password"/>
+			<param name="content_type" value=""/>
+			<param name="connect_timeout" value="300"/>
+			<param name="timeout" value="0"/>
+			<param name="post_data_template" value="type=${type}&app_id=${app_id}&user=${user}&realm=${realm}&token=${token}&platform=${platform}&payload=${payload}"/>
+		</profile>
+	</profiles>
+</configuration>
