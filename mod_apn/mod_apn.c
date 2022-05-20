@@ -766,7 +766,7 @@ end:
 
 static void register_event_handler(switch_event_t *event)
 {
-	char *event_user = NULL, *event_realm = NULL, *event_contact = NULL;
+	char *event_user = NULL, *event_realm = NULL;//, *event_contact = NULL;
 	char *contact_ptr = NULL, *voip_token = NULL, *im_token = NULL, *platform = NULL, *foo = NULL, *query = NULL, *app_id = NULL;
 	char *update_reg = NULL, *user_agent = NULL;
 
@@ -775,10 +775,10 @@ static void register_event_handler(switch_event_t *event)
 		return;
 	}
 
-	event_contact = switch_event_get_header(event, "contact");
-	if (zstr(event_contact)) {
-		return;
-	}
+	// event_contact = switch_event_get_header(event, "contact");
+	// if (zstr(event_contact)) {
+	// 	return;
+	// }
 
 	user_agent = switch_event_get_header(event, "user-agent");
 	if (zstr(user_agent)) {
@@ -831,9 +831,9 @@ static void register_event_handler(switch_event_t *event)
 	if (platform && (foo = strchr(platform, ';')) != NULL) {
 		*platform = '\0';
 	}
-	if(zstr(app_id)){
-		strcpy(app_id, "omnixrm");
-	}
+	// if(zstr(app_id)){
+	// 	strcpy(app_id, "omnixrm");
+	// }
 	if (zstr(app_id) || (zstr(voip_token) && zstr(im_token)) || zstr(platform)) {
 		goto end;
 	}
