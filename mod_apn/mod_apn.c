@@ -3,15 +3,10 @@
 #include <switch_core.h>
 #include <switch_curl.h>
 #include <string.h>
-#include <switch_version.h>
 
 SWITCH_MODULE_LOAD_FUNCTION(mod_apn_load);
 SWITCH_MODULE_SHUTDOWN_FUNCTION(mod_apn_shutdown);
 SWITCH_MODULE_DEFINITION(mod_apn, mod_apn_load, mod_apn_shutdown, NULL);
-
-#define SWITCH_LESS_THAN(x,y)                                                           \
-   (((FS_VERSION_MAJOR == x) && (FS_VERSION_MINOR == y)) || \
-   ((FS_VERSION_MAJOR == x) && (FS_VERSION_MINOR < y)) || (FS_VERSION_MAJOR < x))
 
 static switch_event_node_t *register_event = NULL;
 static switch_event_node_t *push_event = NULL;
@@ -1116,15 +1111,9 @@ static switch_call_cause_t apn_wait_outgoing_channel(switch_core_session_t *sess
 			}
 
 
-#if SWITCH_LESS_THAN(1,8)
-			if (switch_ivr_originate(session, new_session, &cause, destination, current_timelimit, NULL,
-					cid_name_override, cid_num_override, outbound_profile, var_event, flags,
-					cancel_cause) == SWITCH_STATUS_SUCCESS) {
-#else
 			if (switch_ivr_originate(session, new_session, &cause, destination, current_timelimit, NULL,
 					cid_name_override, cid_num_override, outbound_profile, var_event, flags,
 					cancel_cause, NULL) == SWITCH_STATUS_SUCCESS) {
-#endif
 				const char *context;
 				switch_caller_profile_t *cp;
 				switch_channel_t *new_channel = NULL;
