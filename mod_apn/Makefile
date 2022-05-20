@@ -1,7 +1,7 @@
 ################################
 ### FreeSwitch headers files found in libfreeswitch-dev ###
-FS_INCLUDES=/opt/homebrew/Cellar/freeswitch/1.10.7_3/include/freeswitch
-FS_MODULES=/opt/homebrew/Cellar/freeswitch/1.10.7_3/lib/freeswitch/mod
+FS_INCLUDES=/usr/include/freeswitch
+FS_MODULES=/usr/lib/freeswitch/mod
 ################################
 
 ### END OF CUSTOMIZATION ###
