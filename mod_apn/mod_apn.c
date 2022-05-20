@@ -601,7 +601,6 @@ static void add_item_to_event(switch_event_t *event, char *name, cJSON *obj)
 static void push_event_handler(switch_event_t *event)
 {
 	char *payload = NULL, *user = NULL, *realm = NULL, *type = NULL, *uuid = NULL, *json_tokens = NULL;
-	char *cid_name = NULL, *cid_number = NULL;
 	profile_t *profile = NULL;
 	callback_t cbt = { cJSON_CreateArray() };
 	switch_bool_t res = SWITCH_FALSE;
