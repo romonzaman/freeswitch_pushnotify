@@ -23,6 +23,7 @@ static struct {
 	char *contact_im_token_param;
 	char *contact_app_id_param;
 	char *contact_platform_param;
+	int debug;
 } globals;
 
 enum auth_type {
@@ -399,6 +400,8 @@ static switch_status_t do_config(switch_memory_pool_t *pool)
 	profile_t *profile = NULL;
 	switch_cache_db_handle_t *dbh = NULL;
 
+	globals.debug = 0;
+
 	if (!(xml = switch_xml_open_cfg(cf, &cfg, NULL))) {
 		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_WARNING, "open of %s failed\n", cf);
 		return SWITCH_STATUS_TERM;
@@ -435,6 +438,8 @@ static switch_status_t do_config(switch_memory_pool_t *pool)
 				globals.contact_im_token_param = switch_core_strdup(globals.pool, val);
 			} else if (!strcasecmp(var, "contact_app_id_param") && !zstr(val)) {
 				globals.contact_app_id_param = switch_core_strdup(globals.pool, val);
+			} else if (!strcasecmp(var, "debug") && !zstr(val)) {
+				globals.debug = atoi(val);
 			}
 		}
 	}
@@ -784,8 +789,9 @@ static void register_event_handler(switch_event_t *event)
 	if (zstr(user_agent)) {
 		return;
 	}
-	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "user_agent: '%s'\n", user_agent);
-
+	if(globals.debug) {
+		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "user_agent: '%s'\n", user_agent);
+	}
 	ua_ptr = app_id = voip_token = im_token = platform = strdup(user_agent);
 
 	if (zstr(ua_ptr)) {
@@ -832,17 +838,21 @@ static void register_event_handler(switch_event_t *event)
 	if (platform && (foo = strchr(platform, ';')) != NULL) {
 		*foo = '\0';
 	}
-	if (!zstr(app_id)){
-		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "app_id='%s'\n", app_id);
-	}
-	if (!zstr(voip_token)){
-		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "voip_token='%s'\n", voip_token);
-	}
-	if (!zstr(platform)){
-		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "platform='%s'\n", platform);
+	if(globals.debug) {
+		if (!zstr(app_id)){
+			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "app_id='%s'\n", app_id);
+		}
+		if (!zstr(voip_token)){
+			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "voip_token='%s'\n", voip_token);
+		}
+		if (!zstr(platform)){
+			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "platform='%s'\n", platform);
+		}
 	}
 	if (zstr(app_id) || (zstr(voip_token) && zstr(im_token)) || zstr(platform)) {
-		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "missing app_id/voip_token/im_token/platform in user_agent\n");
+		if(globals.debug) {
+			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "missing app_id/voip_token/im_token/platform in user_agent\n");
+		}
 		goto end;
 	}
 
