@@ -758,6 +758,10 @@ static void originate_register_event_handler(switch_event_t *event)
 								 event_username,
 								 event_realm);
 
+	if(globals.debug) {
+		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "destination: '%s'\n", destination);
+	}
+
 	switch_mutex_lock(handles_mutex);
 	originate_data->destination = switch_core_strdup(pool, destination);
 	switch_mutex_unlock(handles_mutex);
@@ -1135,6 +1139,10 @@ static switch_call_cause_t apn_wait_outgoing_channel(switch_core_session_t *sess
 		switch_mutex_unlock(originate_data.mutex);
 
 		if (!zstr(destination)) {
+			if(globals.debug) {
+				switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "destination: '%s'\n", destination);
+			}
+
 			/*Unbind from 'sofia::register' event for current originate route*/
 			if (register_event) {
 				switch_event_unbind(&register_event);
