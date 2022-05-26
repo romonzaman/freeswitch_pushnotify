@@ -204,7 +204,7 @@ static switch_bool_t mod_apn_send(switch_event_t *event, profile_t *profile)
 		return ret;
 	}
 
-	if (do_curl(event, profile) == CURLE_OK) {
+	if (do_curl(event, profile) == 200) {
 		ret = SWITCH_TRUE;
 	}
 
