@@ -1045,7 +1045,7 @@ static switch_call_cause_t apn_wait_outgoing_channel(switch_core_session_t *sess
 
 	if (var_event) {
 		cid_name_override = switch_event_get_header(var_event, "origination_caller_id_name");
-		cid_num_override = switch_event_get_header(var_event, "origination_caller_id_number");
+		cid_num_override = switch_event_get_header(var_event, "apn_caller");
 		if ((var_val = switch_event_get_header(var_event, "originate_timeout"))) {
 			int tmp = (int)strtol(var_val, NULL, 10);
 			if (tmp > 0) {
@@ -1114,8 +1114,12 @@ static switch_call_cause_t apn_wait_outgoing_channel(switch_core_session_t *sess
 			switch_mutex_lock(apn_response.mutex);
 			if (apn_response.state == MOD_APN_NOTSENT) {
 				switch_mutex_unlock(apn_response.mutex);
-				switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "CARUSTO. Event APN don't sent to %s@%s, so stop wait for incoming register\n", user, domain);
-				break;
+				if(globals.debug) {
+					switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "CARUSTO. Event APN don't sent to %s@%s, so stop wait for incoming register\n", user, domain);
+				}
+				//todo: need to find out why it is detecting curl failed
+				//disable this logic for now
+				//break;
 			}
 			switch_mutex_unlock(apn_response.mutex);
 		}
